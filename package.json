@@ -1,0 +1,19 @@
+{
+  "name": "rss-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "node script.js && node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dayjs": "^1.11.3",
+    "dotenv": "^16.0.1",
+    "node-telegram-bot-api": "^0.58.0",
+    "opml": "^0.4.24",
+    "rss-parser": "^3.12.0"
+  }
+}

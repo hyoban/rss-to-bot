@@ -1,0 +1,30 @@
+name: send feeds to bot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/50 * * * *'
+
+jobs:
+  all:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: corepack enable
+      - run: npm install --location=global @antfu/ni
+
+      - run: ni
+
+      - env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: nr run
+
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: 'sent.json'
