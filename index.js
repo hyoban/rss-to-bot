@@ -3,6 +3,7 @@ const TelegramBot = require('node-telegram-bot-api')
 const feed = require('./feeds.json')
 const Parser = require('rss-parser')
 const fs = require('fs/promises')
+const axios = require('axios').default
 require('dotenv').config()
 
 const token = process.env.TG_TOKEN
@@ -52,69 +53,144 @@ const isFeedNeedToBeSent = (item) => {
   return true
 }
 
+const isImageUrl = async (url) => {
+  // fetch the image and check the content type
+  try {
+    const res = await axios.head(url)
+    return res.headers['content-type'].startsWith('image/')
+  } catch (e) {
+    return false
+  }
+}
+
+const handleError = (e) => {
+  if (
+    ![
+      'failed to get HTTP URL content',
+      'Failed to get HTTP URL content',
+      'Wrong type of the web page content',
+      'wrong file identifier/HTTP URL specified',
+    ].some((i) => e.message.includes(i))
+  ) {
+    process.exit(1)
+  }
+}
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const send = async (item, subItem) => {
+  if (item.content) {
+    let images = []
+    for (const i of item.content.matchAll(
+      /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg))/g,
+    )) {
+      if ((await isImageUrl(i[0])) && images.length < 9) {
+        images.push(i[0])
+      }
+    }
+    if (images.length > 0) {
+      const caption = {
+        caption:
+          `<b>${item.title}</b>` + '\n' + subItem.title + '\n\n' + item.link,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }
+      if (images.length > 1) {
+        try {
+          await delay(5000)
+          await bot.sendMediaGroup(
+            chatId,
+            images.map((v, i) => {
+              if (i === 0) {
+                return {
+                  type: 'photo',
+                  media: v,
+                  ...caption,
+                }
+              } else {
+                return {
+                  type: 'photo',
+                  media: v,
+                }
+              }
+            }),
+          )
+          return
+        } catch (e) {
+          console.log(
+            'error(send to tg):',
+            item.title,
+            subItem.title,
+            subItem.xmlUrl,
+            images,
+            e.message,
+          )
+          handleError(e)
+        }
+      } else {
+        try {
+          await delay(5000)
+          await bot.sendPhoto(chatId, images[0], caption)
+          return
+        } catch (e) {
+          console.log(
+            'error(send to tg):',
+            item.title,
+            subItem.title,
+            subItem.xmlUrl,
+            images,
+            e.message,
+          )
+          handleError(e)
+        }
+      }
+    }
+  }
+  try {
+    await delay(5000)
+    await bot.sendMessage(
+      chatId,
+      `<b>${item.title}</b>` + '\n' + subItem.title + '\n\n' + item.link,
+      { parse_mode: 'HTML', disable_web_page_preview: true },
+    )
+  } catch (e) {
+    console.log(
+      'error(send to tg):',
+      item.title,
+      subItem.title,
+      subItem.xmlUrl,
+      e.message,
+    )
+    handleError(e)
+  }
+}
+
 const parseAndSend = async (subItem) => {
   try {
     const res = await parser.parseURL(subItem.xmlUrl)
     console.log('feed:', subItem.title, subItem.xmlUrl)
-    for (const item of res.items) {
-      const date = dayjs(item.isoDate)
-      if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
-        if (!sent.has(JSON.stringify({ date, link: item.link }))) {
-          sent.add(JSON.stringify({ date, link: item.link }))
-          if (item.content) {
-            const images = item.content.match(
-              /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg))/g,
-            )
-            if (images != null) {
-              const caption = {
-                caption:
-                  `<b>${item.title}</b>` +
-                  '\n' +
-                  subItem.title +
-                  '\n\n' +
-                  item.link,
-                parse_mode: 'HTML',
-                disable_web_page_preview: true,
-              }
-              if (images.length > 1) {
-                await bot.sendMediaGroup(
-                  chatId,
-                  images.map((v, i) => {
-                    if(i === 0) {
-                      return {
-                        type: 'photo',
-                        media: v,
-                        ...caption
-                      }
-                    } else {
-                      return {
-                        type: 'photo',
-                        media: v,
-                      }
-                    }
-                  }),
-                )
-              } else {
-                await bot.sendPhoto(chatId, images[0], caption)
-              }
-              continue
-            }
+    if (process.env.IS_TEST) {
+      await send(res.items[0], subItem)
+    } else {
+      for (const item of res.items) {
+        const date = dayjs(item.isoDate)
+        if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
+          if (!sent.has(JSON.stringify({ date, link: item.link }))) {
+            sent.add(JSON.stringify({ date, link: item.link }))
+            await send(item, subItem)
           }
-          await bot.sendMessage(
-            chatId,
-            `<b>${item.title}</b>` + '\n' + subItem.title + '\n\n' + item.link,
-            { parse_mode: 'HTML', disable_web_page_preview: true },
-          )
         }
       }
     }
   } catch (e) {
-    console.log('error:', subItem.title, subItem.xmlUrl, e)
+    console.log('error:', subItem.title, subItem.xmlUrl)
   }
 }
 
 async function main() {
-  await load()
+  if (!process.env.IS_TEST) {
+    await load()
+  }
   for (const group of feed.opml.body.subs) {
     if (group.subs) {
       for (const subItem of group.subs) {
@@ -124,7 +200,9 @@ async function main() {
       await parseAndSend(group)
     }
   }
-  await save()
+  if (!process.env.IS_TEST) {
+    await save()
+  }
 }
 
 main()

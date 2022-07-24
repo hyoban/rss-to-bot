@@ -38,6 +38,7 @@ if (newFeeds.length !== 0) {
   fs.readFile('./feeds.opml', function (err, opmltext) {
     if (!err) {
       opml.parse(opmltext, function (err, theOutline) {
+        console.log('total feeds:', countFeeds(theOutline.opml.body.subs))
         if (!err) {
           fs.writeFile(
             './feeds.json',
@@ -52,4 +53,16 @@ if (newFeeds.length !== 0) {
       })
     }
   })
+}
+
+const countFeeds = (subs) => {
+  let count = 0
+  subs.forEach((sub) => {
+    if (sub.type === 'rss') {
+      count++
+    } else {
+      count += countFeeds(sub.subs)
+    }
+  })
+  return count
 }
