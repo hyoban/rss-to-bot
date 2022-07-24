@@ -63,7 +63,15 @@ const isImageUrl = async (url) => {
   }
 }
 
-const handleError = (e) => {
+const handleError = (e, item, subItem, images) => {
+  console.log(
+    'error(send to tg):',
+    item.title,
+    subItem.title,
+    subItem.xmlUrl,
+    images,
+    e.message,
+  )
   if (
     ![
       'failed to get HTTP URL content',
@@ -117,15 +125,7 @@ const send = async (item, subItem) => {
           )
           return
         } catch (e) {
-          console.log(
-            'error(send to tg):',
-            item.title,
-            subItem.title,
-            subItem.xmlUrl,
-            images,
-            e.message,
-          )
-          handleError(e)
+          handleError(e, item, subItem, images)
         }
       } else {
         try {
@@ -133,15 +133,7 @@ const send = async (item, subItem) => {
           await bot.sendPhoto(chatId, images[0], caption)
           return
         } catch (e) {
-          console.log(
-            'error(send to tg):',
-            item.title,
-            subItem.title,
-            subItem.xmlUrl,
-            images,
-            e.message,
-          )
-          handleError(e)
+          handleError(e, item, subItem, images)
         }
       }
     }
@@ -154,14 +146,7 @@ const send = async (item, subItem) => {
       { parse_mode: 'HTML', disable_web_page_preview: true },
     )
   } catch (e) {
-    console.log(
-      'error(send to tg):',
-      item.title,
-      subItem.title,
-      subItem.xmlUrl,
-      e.message,
-    )
-    handleError(e)
+    handleError(e, item, subItem)
   }
 }
 
