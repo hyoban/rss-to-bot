@@ -3,7 +3,7 @@ name: send feeds to bot
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/50 * * * *'
+    - cron: '0 */4 * * *'
 
 jobs:
   all:
