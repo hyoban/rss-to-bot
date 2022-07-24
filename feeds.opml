@@ -48,7 +48,6 @@
       <outline text="freeCodeCamp.org" title="freeCodeCamp.org" description="" type="rss" version="RSS" htmlUrl="https://www.freecodecamp.org/news/" xmlUrl="https://www.freecodecamp.org/news/rss/" />
       <outline text="V2EX-最热主题" title="V2EX-最热主题" description="" type="rss" version="RSS" htmlUrl="https://www.v2ex.com/" xmlUrl="http://rsshub.app/v2ex/topics/hot" />
       <outline text="w2solo - 独立开发者社区" title="w2solo - 独立开发者社区" description="" type="rss" version="RSS" htmlUrl="https://w2solo.com/" xmlUrl="https://w2solo.com/topics/feed" />
-      <outline text="少数派" title="少数派" description="" type="rss" version="RSS" htmlUrl="https://sspai.com/" xmlUrl="https://sspai.com/feed" />
       <outline text="黑客说的最新帖子" title="黑客说的最新帖子" description="" type="rss" version="RSS" htmlUrl="https://hackertalk.net/?tab=new" xmlUrl="http://rsshub.app/hackertalk" />
       <outline text="博客" title="博客">
          <outline text="1 Byte" title="1 Byte" description="" type="rss" version="RSS" htmlUrl="https://1byte.io/" xmlUrl="https://1byte.io/rss.xml" />
