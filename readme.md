@@ -12,6 +12,12 @@ Use GitHub Action to send your rss feed to telegram bot.
 if you don't know how to get chat id, maybe you can use following code.
 
 ```js
+const TelegramBot = require('node-telegram-bot-api')
+
+const token = 'xxxxx'
+const bot = new TelegramBot(token, { polling: true })
+let chatId = null
+
 bot.onText(/\/start/, (msg) => {
   chatId = msg.chat.id
   console.log('chatId:', chatId)
