@@ -61,13 +61,48 @@ const parseAndSend = async (subItem) => {
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
         if (!sent.has(JSON.stringify({ date, link: item.link }))) {
           sent.add(JSON.stringify({ date, link: item.link }))
+          if (item.content) {
+            const images = item.content.match(
+              /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg))/g,
+            )
+            if (images != null) {
+              const caption = {
+                caption:
+                  `<b>${item.title}</b>` +
+                  '\n' +
+                  subItem.title +
+                  '\n\n' +
+                  item.link,
+                parse_mode: 'HTML',
+                disable_web_page_preview: true,
+              }
+              if (images.length > 1) {
+                await bot.sendMediaGroup(
+                  chatId,
+                  images.map((v, i) => {
+                    if(i === 0) {
+                      return {
+                        type: 'photo',
+                        media: v,
+                        ...caption
+                      }
+                    } else {
+                      return {
+                        type: 'photo',
+                        media: v,
+                      }
+                    }
+                  }),
+                )
+              } else {
+                await bot.sendPhoto(chatId, images[0], caption)
+              }
+              continue
+            }
+          }
           await bot.sendMessage(
             chatId,
-            `<b>${item.title}</b>` +
-              '\n' +
-              subItem.title +
-              '\n\n' +
-              item.link,
+            `<b>${item.title}</b>` + '\n' + subItem.title + '\n\n' + item.link,
             { parse_mode: 'HTML', disable_web_page_preview: true },
           )
         }
