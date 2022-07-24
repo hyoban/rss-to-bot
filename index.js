@@ -66,10 +66,8 @@ const parseAndSend = async (subItem) => {
             `<b>${item.title}</b>` +
               '\n' +
               subItem.title +
-              '\n' +
-              item.pubDate +
-              '\n' +
-              `<a href="${item.link}">Link</a>`,
+              '\n\n' +
+              item.link,
             { parse_mode: 'HTML', disable_web_page_preview: true },
           )
         }
