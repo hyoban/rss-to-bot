@@ -12,6 +12,12 @@ if (newFeeds.length !== 0) {
       console.log(`Adding ${feed.title}`)
       const opmlFile = fs.readFileSync('./feeds.opml', 'utf8')
       opml.parse(opmlFile, (_err, opmlDoc) => {
+        if (
+          opmlDoc.opml.body.subs.flat().some((item) => item.xmlUrl === feedUrl)
+        ) {
+          console.log(`${feed.title} already exists`)
+          return
+        }
         const newOutline = {
           text: feed.title,
           title: feed.title,
@@ -24,7 +30,6 @@ if (newFeeds.length !== 0) {
         opmlDoc.opml.body.subs.push(newOutline)
         const newOpml = opml.stringify(opmlDoc)
         fs.writeFileSync('./feeds.opml', newOpml)
-        console.log(`${feed.title} done`)
       })
     })
   })
