@@ -3,3 +3,4 @@ node_modules
 feeds.json
 feeds copy.opml
 .pnpm-debug.log
+dist
