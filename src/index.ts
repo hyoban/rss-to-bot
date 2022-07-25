@@ -117,7 +117,7 @@ const send = async (item: Item, subItem: Sub) => {
       }
       if (images.length > 1) {
         try {
-          await delay(5000)
+          await delay(500)
           await bot.sendMediaGroup(
             chatId,
             images.map((v, i) => {
@@ -145,7 +145,7 @@ const send = async (item: Item, subItem: Sub) => {
       }
       else {
         try {
-          await delay(5000)
+          await delay(500)
           await bot.sendPhoto(chatId, images[0], caption)
           success++
           return
@@ -157,7 +157,7 @@ const send = async (item: Item, subItem: Sub) => {
     }
   }
   try {
-    await delay(5000)
+    await delay(500)
     await bot.sendMessage(
       chatId,
       `<b>${item.title}</b>` + `\n${subItem.title}\n\n${item.link}`,
