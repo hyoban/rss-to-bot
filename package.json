@@ -8,13 +8,14 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "run": "cd src && esno script.ts && esno index.ts",
-    "add": "cd src && esno script.ts",
+    "run": "cd src && esno script.ts wirte && esno index.ts",
+    "add": "cd src && esno script.ts add",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "cac": "^6.7.12",
     "dayjs": "^1.11.3",
     "dotenv": "^16.0.1",
     "node-telegram-bot-api": "^0.58.0",
