@@ -1,5 +1,5 @@
 {
-  "name": "rss-bot",
+  "name": "rss-to-bot",
   "type": "module",
   "version": "1.0.0",
   "description": "",
@@ -8,8 +8,8 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "run": "cd src && node script.js && node index.js",
-    "add": "cd src && node script.js",
+    "run": "cd src && esno script.ts && esno index.ts",
+    "add": "cd src && esno script.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -22,7 +22,10 @@
     "rss-parser": "^3.12.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config-basic": "^0.25.2",
-    "eslint": "^8.20.0"
+    "@antfu/eslint-config": "^0.25.2",
+    "@types/node": "^18.6.1",
+    "eslint": "^8.20.0",
+    "esno": "^0.16.3",
+    "typescript": "^4.7.4"
   }
 }

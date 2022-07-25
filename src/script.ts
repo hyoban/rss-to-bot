@@ -1,12 +1,15 @@
 import { readFile, readFileSync, writeFile, writeFileSync } from 'fs'
+// @ts-expect-error no type information available for module
 import { parse, stringify } from 'opml'
 import Parser from 'rss-parser'
 import * as dotenv from 'dotenv'
+import type { Feeds, Sub } from './types'
+import { Type, Version } from './types'
 dotenv.config()
 
-const countFeeds = (subs) => {
+const countFeeds = (subs: Sub[] | undefined) => {
   let count = 0
-  subs.forEach((sub) => {
+  subs?.forEach((sub) => {
     if (sub.type === 'rss')
       count++
     else
@@ -15,9 +18,9 @@ const countFeeds = (subs) => {
   return count
 }
 
-const getAllFeeds = (subs) => {
-  let feeds = []
-  subs.forEach((sub) => {
+const getAllFeeds = (subs: Sub[] | undefined) => {
+  let feeds: Sub[] = []
+  subs?.forEach((sub) => {
     if (sub.type === 'rss')
       feeds.push(sub)
     else
@@ -28,47 +31,42 @@ const getAllFeeds = (subs) => {
 
 const parser = new Parser()
 
-const parseAndWrite = (feedUrl, folder) => {
-  parser.parseURL(feedUrl, (err, feed) => {
-    if (!err) {
-      console.log(`Adding ${feed.title}`)
-      const opmlFile = readFileSync('./feeds.opml', 'utf8')
-      parse(opmlFile, (_err, opmlDoc) => {
-        if (
-          getAllFeeds(opmlDoc.opml.body.subs).some(item => item.xmlUrl === feedUrl)
-        ) {
-          console.log(`${feed.title} already exists`)
-          return
-        }
-        const newOutline = {
-          text: feed.title,
-          title: feed.title,
-          description: feed.description || '',
-          type: 'rss',
-          version: 'RSS',
-          xmlUrl: feedUrl,
-          htmlUrl: feed.link,
-        }
-        if (folder) {
-          const folderIndex = opmlDoc.opml.body.subs.findIndex(
-            item => item.text === folder && item.subs,
-          )
-          if (folderIndex === -1) {
-            console.log(`Folder ${folder} not found`)
-            return
-          }
-          opmlDoc.opml.body.subs[folderIndex].subs.push(newOutline)
-        }
-        else {
-          opmlDoc.opml.body.subs.push(newOutline)
-        }
-        const newOpml = stringify(opmlDoc)
-        writeFileSync('./feeds.opml', newOpml)
-      })
+const parseAndWrite = async (feedUrl: string, folder: string) => {
+  const feed = await parser.parseURL(feedUrl)
+  // eslint-disable-next-line no-console
+  console.log(`Adding ${feed.title}`)
+  const opmlFile = readFileSync('./feeds.opml', 'utf8')
+  parse(opmlFile, (_err: any, opmlDoc: Feeds) => {
+    if (
+      getAllFeeds(opmlDoc.opml.body.subs).some(item => item.xmlUrl === feedUrl)
+    ) {
+      console.error(`${feed.title} already exists`)
+      return
+    }
+    const newOutline: Sub = {
+      text: feed.title || '',
+      title: feed.title || '',
+      description: feed.description || '',
+      type: Type.RSS,
+      version: Version.RSS,
+      xmlUrl: feedUrl,
+      htmlUrl: feed.link,
+    }
+    if (folder) {
+      const folderIndex = opmlDoc.opml.body.subs.findIndex(
+        item => item.text === folder && item.subs,
+      )
+      if (folderIndex === -1) {
+        console.error(`Folder ${folder} not found`)
+        return
+      }
+      opmlDoc.opml.body.subs[folderIndex].subs?.push(newOutline)
     }
     else {
-      console.error(err)
+      opmlDoc.opml.body.subs.push(newOutline)
     }
+    const newOpml = stringify(opmlDoc)
+    writeFileSync('./feeds.opml', newOpml)
   })
 }
 
@@ -83,7 +81,7 @@ if (newFeed.length !== 0) {
   else if (shortcode === 'ab') {
     parser.parseURL(`http://rsshub.hyoban.cc:1200/bilibili/user/followings/${feedUrl}`, (_err, feed) => {
       feed.items.forEach((item) => {
-        parseAndWrite(`https://rsshub.app/bilibili/user/dynamic/${item.link.split('/').pop()}`, '视频')
+        parseAndWrite(`https://rsshub.app/bilibili/user/dynamic/${item.link?.split('/').pop()}`, '视频')
       })
     })
   }
@@ -101,7 +99,8 @@ else {
   // opml to json
   readFile('./feeds.opml', (err, opmltext) => {
     if (!err) {
-      parse(opmltext, (err, theOutline) => {
+      parse(opmltext, (err: any, theOutline: any) => {
+        // eslint-disable-next-line no-console
         console.log('total feeds:', countFeeds(theOutline.opml.body.subs))
         if (!err) {
           writeFile(
@@ -109,6 +108,7 @@ else {
             JSON.stringify(theOutline, undefined, 4),
             (err) => {
               if (!err)
+                // eslint-disable-next-line no-console
                 console.log('Successfully written to file')
             },
           )
@@ -116,7 +116,7 @@ else {
       })
     }
     else {
-      console.log(err)
+      console.error(err)
       process.exit(1)
     }
   })

@@ -1,9 +1,16 @@
-import { readFile, writeFile } from 'fs/promises'
+import { writeFile } from 'fs/promises'
+import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
+// @ts-expect-error no type information available for module
 import TelegramBot from 'node-telegram-bot-api'
+import type { Item } from 'rss-parser'
 import Parser from 'rss-parser'
 import axios from 'axios'
-import * as dotenv from 'dotenv'
+import dotenv from 'dotenv'
+import feeds from './feeds.json'
+import data from './sent.json'
+import type { Sub } from './types'
+
 dotenv.config()
 
 const token = process.env.TG_TOKEN
@@ -12,10 +19,10 @@ const chatId = process.env.TG_CHAT_ID
 
 const parser = new Parser()
 
-const isDateVaild = date => date.isAfter(dayjs().subtract(1, 'day'))
-const isFeedNeedToBeSent = (item) => {
+const isDateVaild = (date: Dayjs) => date.isAfter(dayjs().subtract(1, 'day'))
+const isFeedNeedToBeSent = (item: Item) => {
   if (
-    item.link.includes('https://github.com/')
+    item.link?.includes('https://github.com/')
     && [
       'deleted branch',
       'pushed to',
@@ -24,7 +31,7 @@ const isFeedNeedToBeSent = (item) => {
       'closed a pull request',
       'created a tag',
       'deleted tag',
-    ].some(i => item.title.includes(i))
+    ].some(i => item.title?.includes(i))
   ) return false
 
   return true
@@ -33,27 +40,28 @@ const isFeedNeedToBeSent = (item) => {
 let sent = new Set()
 
 async function save() {
+  // eslint-disable-next-line no-console
   console.log('save sent feeds to file', sent.size)
   await writeFile('./sent.json', JSON.stringify(Array.from(sent)))
 }
 
 async function load() {
   try {
-    const data = await readFile('./sent.json')
-    const pre = Array.from(JSON.parse(data))
+    const pre = Array.from(data)
       .map(i => JSON.parse(i))
       .map(i => ({ date: dayjs(i.date), link: i.link }))
       .filter(i => isDateVaild(i.date))
       .map(i => JSON.stringify(i))
     sent = new Set(pre)
+    // eslint-disable-next-line no-console
     console.log('load sent feeds from file', sent.size)
   }
   catch (e) {
-    console.log('error:', e)
+    console.error('error:', e)
   }
 }
 
-const isImageUrl = async (url) => {
+const isImageUrl = async (url: string) => {
   // fetch the image and check the content type
   if (url.startsWith('https://h5.sinaimg.cn/m/emoticon/icon/default/'))
     return false
@@ -67,8 +75,8 @@ const isImageUrl = async (url) => {
   }
 }
 
-const handleError = (e, item, subItem, images) => {
-  console.log(
+const handleError = (e: any, item: Item, subItem: Sub, images?: string[]) => {
+  console.error(
     'error(send to tg):',
     item.title,
     subItem.title,
@@ -86,11 +94,11 @@ const handleError = (e, item, subItem, images) => {
   ) process.exit(1)
 }
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 let success = 0
 
-const send = async (item, subItem) => {
+const send = async (item: Item, subItem: Sub) => {
   if (item.content) {
     const images = []
     for (const i of item.content.matchAll(
@@ -162,9 +170,10 @@ const send = async (item, subItem) => {
   }
 }
 
-const parseAndSend = async (subItem) => {
+const parseAndSend = async (subItem: Sub) => {
   try {
-    const res = await parser.parseURL(subItem.xmlUrl)
+    const res = await parser.parseURL(subItem.xmlUrl!)
+    // eslint-disable-next-line no-console
     console.log('feed:', subItem.title, subItem.xmlUrl)
     if (process.env.IS_TEST) {
       await send(res.items[0], subItem)
@@ -182,22 +191,20 @@ const parseAndSend = async (subItem) => {
     }
   }
   catch (e) {
-    console.log('error:', subItem.title, subItem.xmlUrl)
+    console.error('error:', subItem.title, subItem.xmlUrl)
   }
 }
 
 async function main() {
   if (!process.env.IS_TEST)
     await load()
-  const fileUrl = new URL('./feeds.json', import.meta.url)
-  const feeds = JSON.parse(await readFile(fileUrl))
   for (const group of feeds.opml.body.subs) {
     if (group.subs)
-      for (const subItem of group.subs) await parseAndSend(subItem)
-
+      for (const subItem of group.subs) await parseAndSend(subItem as Sub)
     else
-      await parseAndSend(group)
+      await parseAndSend(group as Sub)
   }
+  // eslint-disable-next-line no-console
   console.log('success:', success)
   if (!process.env.IS_TEST)
     await save()
