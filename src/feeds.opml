@@ -247,6 +247,8 @@
 			<outline text="骇客说 的 bilibili 动态" title="骇客说 的 bilibili 动态" description="" type="rss" version="RSS" htmlUrl="https://space.bilibili.com/1744511516/dynamic" xmlUrl="https://rsshub.app/bilibili/user/dynamic/1744511516" />
 			<outline text="魔术师卡颂 的 bilibili 动态" title="魔术师卡颂 的 bilibili 动态" description="" type="rss" version="RSS" htmlUrl="https://space.bilibili.com/453618117/dynamic" xmlUrl="https://rsshub.app/bilibili/user/dynamic/453618117" />
 			<outline text="龙本龙猫本猫 的 bilibili 动态" title="龙本龙猫本猫 的 bilibili 动态" description="" type="rss" version="RSS" htmlUrl="https://space.bilibili.com/68819758/dynamic" xmlUrl="https://rsshub.app/bilibili/user/dynamic/68819758" />
+			<outline text="CodingStartup起码课 的 bilibili 动态" title="CodingStartup起码课 的 bilibili 动态" description="CodingStartup起码课 的 bilibili 动态 - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)" type="rss" version="RSS" xmlUrl="http://rsshub.app/bilibili/user/dynamic/451368848" htmlUrl="https://space.bilibili.com/451368848/dynamic" />
+			<outline text="AnthonyFu一个托尼 的 bilibili 动态" title="AnthonyFu一个托尼 的 bilibili 动态" description="AnthonyFu一个托尼 的 bilibili 动态 - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)" type="rss" version="RSS" xmlUrl="http://rsshub.app/bilibili/user/dynamic/668380" htmlUrl="https://space.bilibili.com/668380/dynamic" />
 			</outline>
 		<outline text="时间线" title="时间线" >
 			<outline text="AliveGameStudio的微博" title="AliveGameStudio的微博" description="" type="rss" version="RSS" htmlUrl="https://weibo.com/1743273140/" xmlUrl="http://rsshub.hyoban.cc:1200/weibo/user/1743273140" />

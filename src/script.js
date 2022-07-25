@@ -15,34 +15,51 @@ const countFeeds = (subs) => {
   return count
 }
 
-const newFeeds = process.argv.slice(2)
-if (newFeeds.length !== 0) {
+const newFeed = process.argv.slice(2)
+if (newFeed.length !== 0) {
   // add a new feed to the opml file
-  newFeeds.forEach((feedUrl) => {
-    const parser = new Parser()
-    parser.parseURL(feedUrl, (_err, feed) => {
-      console.log(`Adding ${feed.title}`)
-      const opmlFile = readFileSync('./feeds.opml', 'utf8')
-      parse(opmlFile, (_err, opmlDoc) => {
-        if (
-          opmlDoc.opml.body.subs.flat().some(item => item.xmlUrl === feedUrl)
-        ) {
-          console.log(`${feed.title} already exists`)
+  // eslint-disable-next-line prefer-const
+  let [shortcode, feedUrl, folder] = newFeed
+  // custom your own shortcode
+  if (shortcode === 'b') {
+    feedUrl = `https://rsshub.app/bilibili/user/dynamic/${feedUrl}`
+    folder = '视频'
+  }
+  const parser = new Parser()
+  parser.parseURL(feedUrl, (_err, feed) => {
+    console.log(`Adding ${feed.title}`)
+    const opmlFile = readFileSync('./feeds.opml', 'utf8')
+    parse(opmlFile, (_err, opmlDoc) => {
+      if (
+        opmlDoc.opml.body.subs.flat().some(item => item.xmlUrl === feedUrl)
+      ) {
+        console.log(`${feed.title} already exists`)
+        return
+      }
+      const newOutline = {
+        text: feed.title,
+        title: feed.title,
+        description: feed.description || '',
+        type: 'rss',
+        version: 'RSS',
+        xmlUrl: feed.feedUrl,
+        htmlUrl: feed.link,
+      }
+      if (folder) {
+        const folderIndex = opmlDoc.opml.body.subs.findIndex(
+          item => item.text === folder && item.subs,
+        )
+        if (folderIndex === -1) {
+          console.log(`Folder ${folder} not found`)
           return
         }
-        const newOutline = {
-          text: feed.title,
-          title: feed.title,
-          description: feed.description || '',
-          type: 'rss',
-          version: 'RSS',
-          xmlUrl: feed.feedUrl,
-          htmlUrl: feed.link,
-        }
+        opmlDoc.opml.body.subs[folderIndex].subs.push(newOutline)
+      }
+      else {
         opmlDoc.opml.body.subs.push(newOutline)
-        const newOpml = stringify(opmlDoc)
-        writeFileSync('./feeds.opml', newOpml)
-      })
+      }
+      const newOpml = stringify(opmlDoc)
+      writeFileSync('./feeds.opml', newOpml)
     })
   })
 }

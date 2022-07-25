@@ -9,6 +9,7 @@
   "main": "index.js",
   "scripts": {
     "run": "cd src && node script.js && node index.js",
+    "add": "cd src && node script.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
