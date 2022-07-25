@@ -90,6 +90,9 @@ if (newFeed.length !== 0) {
   else if (shortcode === 't') {
     parseAndWrite(`https://rsshub.app/twitter/user/${feedUrl}`, '时间线')
   }
+  else if (shortcode === 'w') {
+    parseAndWrite(`http://rsshub.hyoban.cc:1200/weibo/user/${feedUrl}`, '时间线')
+  }
   else {
     parseAndWrite(feedUrl, folder)
   }
