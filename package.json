@@ -1,14 +1,17 @@
 {
   "name": "rss-bot",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "run": "node script.js && node index.js"
-  },
-  "keywords": [],
   "author": "",
   "license": "ISC",
+  "keywords": [],
+  "main": "index.js",
+  "scripts": {
+    "run": "node src/script.js && node src/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
   "dependencies": {
     "axios": "^0.27.2",
     "dayjs": "^1.11.3",
@@ -16,5 +19,9 @@
     "node-telegram-bot-api": "^0.58.0",
     "opml": "^0.4.24",
     "rss-parser": "^3.12.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config-basic": "^0.25.2",
+    "eslint": "^8.20.0"
   }
 }

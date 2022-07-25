@@ -1,0 +1,7 @@
+{
+  "extends": "@antfu/basic",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  }
+}

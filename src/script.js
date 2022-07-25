@@ -1,7 +1,19 @@
-const fs = require('fs')
-const opml = require('opml')
-require('dotenv').config()
-const Parser = require('rss-parser')
+import { readFile, readFileSync, writeFile, writeFileSync } from 'fs'
+import { parse, stringify } from 'opml'
+import Parser from 'rss-parser'
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+const countFeeds = (subs) => {
+  let count = 0
+  subs.forEach((sub) => {
+    if (sub.type === 'rss')
+      count++
+    else
+      count += countFeeds(sub.subs)
+  })
+  return count
+}
 
 const newFeeds = process.argv.slice(2)
 if (newFeeds.length !== 0) {
@@ -10,10 +22,10 @@ if (newFeeds.length !== 0) {
     const parser = new Parser()
     parser.parseURL(feedUrl, (_err, feed) => {
       console.log(`Adding ${feed.title}`)
-      const opmlFile = fs.readFileSync('./feeds.opml', 'utf8')
-      opml.parse(opmlFile, (_err, opmlDoc) => {
+      const opmlFile = readFileSync('./feeds.opml', 'utf8')
+      parse(opmlFile, (_err, opmlDoc) => {
         if (
-          opmlDoc.opml.body.subs.flat().some((item) => item.xmlUrl === feedUrl)
+          opmlDoc.opml.body.subs.flat().some(item => item.xmlUrl === feedUrl)
         ) {
           console.log(`${feed.title} already exists`)
           return
@@ -28,41 +40,29 @@ if (newFeeds.length !== 0) {
           htmlUrl: feed.link,
         }
         opmlDoc.opml.body.subs.push(newOutline)
-        const newOpml = opml.stringify(opmlDoc)
-        fs.writeFileSync('./feeds.opml', newOpml)
+        const newOpml = stringify(opmlDoc)
+        writeFileSync('./feeds.opml', newOpml)
       })
     })
   })
-} else {
+}
+else {
   // opml to json
-  fs.readFile('./feeds.opml', function (err, opmltext) {
+  readFile('./feeds.opml', (err, opmltext) => {
     if (!err) {
-      opml.parse(opmltext, function (err, theOutline) {
+      parse(opmltext, (err, theOutline) => {
         console.log('total feeds:', countFeeds(theOutline.opml.body.subs))
         if (!err) {
-          fs.writeFile(
+          writeFile(
             './feeds.json',
             JSON.stringify(theOutline, undefined, 4),
-            function (err) {
-              if (!err) {
+            (err) => {
+              if (!err)
                 console.log('Successfully written to file')
-              }
             },
           )
         }
       })
     }
   })
-}
-
-const countFeeds = (subs) => {
-  let count = 0
-  subs.forEach((sub) => {
-    if (sub.type === 'rss') {
-      count++
-    } else {
-      count += countFeeds(sub.subs)
-    }
-  })
-  return count
 }
