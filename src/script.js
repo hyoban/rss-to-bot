@@ -15,17 +15,9 @@ const countFeeds = (subs) => {
   return count
 }
 
-const newFeed = process.argv.slice(2)
-if (newFeed.length !== 0) {
-  // add a new feed to the opml file
-  // eslint-disable-next-line prefer-const
-  let [shortcode, feedUrl, folder] = newFeed
-  // custom your own shortcode
-  if (shortcode === 'b') {
-    feedUrl = `https://rsshub.app/bilibili/user/dynamic/${feedUrl}`
-    folder = '视频'
-  }
-  const parser = new Parser()
+const parser = new Parser()
+
+const parseAndWrite = (feedUrl, folder) => {
   parser.parseURL(feedUrl, (_err, feed) => {
     console.log(`Adding ${feed.title}`)
     const opmlFile = readFileSync('./feeds.opml', 'utf8')
@@ -62,6 +54,26 @@ if (newFeed.length !== 0) {
       writeFileSync('./feeds.opml', newOpml)
     })
   })
+}
+
+const newFeed = process.argv.slice(2)
+if (newFeed.length !== 0) {
+  // add a new feed to the opml file
+  const [shortcode, feedUrl, folder] = newFeed
+  // custom your own shortcode
+  if (shortcode === 'b') {
+    parseAndWrite(`https://rsshub.app/bilibili/user/dynamic/${feedUrl}`, '视频')
+  }
+  else if (shortcode === 'ab') {
+    parser.parseURL(`http://rsshub.hyoban.cc:1200/bilibili/user/followings/${feedUrl}`, (_err, feed) => {
+      feed.items.forEach((item) => {
+        parseAndWrite(`https://rsshub.app/bilibili/user/dynamic/${item.link.split('/').pop()}`, '视频')
+      })
+    })
+  }
+  else {
+    parseAndWrite(feedUrl, folder)
+  }
 }
 else {
   // opml to json
