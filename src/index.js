@@ -55,6 +55,9 @@ async function load() {
 
 const isImageUrl = async (url) => {
   // fetch the image and check the content type
+  if (url.startsWith('https://h5.sinaimg.cn/m/emoticon/icon/default/'))
+    return false
+
   try {
     const res = await axios.head(url)
     return res.headers['content-type'].startsWith('image/')
