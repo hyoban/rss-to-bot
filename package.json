@@ -8,7 +8,7 @@
   "keywords": [],
   "main": "index.js",
   "scripts": {
-    "run": "node src/script.js && node src/index.js",
+    "run": "cd src && node script.js && node index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
