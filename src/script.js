@@ -15,44 +15,60 @@ const countFeeds = (subs) => {
   return count
 }
 
+const getAllFeeds = (subs) => {
+  let feeds = []
+  subs.forEach((sub) => {
+    if (sub.type === 'rss')
+      feeds.push(sub)
+    else
+      feeds = feeds.concat(getAllFeeds(sub.subs))
+  })
+  return feeds
+}
+
 const parser = new Parser()
 
 const parseAndWrite = (feedUrl, folder) => {
-  parser.parseURL(feedUrl, (_err, feed) => {
-    console.log(`Adding ${feed.title}`)
-    const opmlFile = readFileSync('./feeds.opml', 'utf8')
-    parse(opmlFile, (_err, opmlDoc) => {
-      if (
-        opmlDoc.opml.body.subs.flat().some(item => item.xmlUrl === feedUrl)
-      ) {
-        console.log(`${feed.title} already exists`)
-        return
-      }
-      const newOutline = {
-        text: feed.title,
-        title: feed.title,
-        description: feed.description || '',
-        type: 'rss',
-        version: 'RSS',
-        xmlUrl: feed.feedUrl,
-        htmlUrl: feed.link,
-      }
-      if (folder) {
-        const folderIndex = opmlDoc.opml.body.subs.findIndex(
-          item => item.text === folder && item.subs,
-        )
-        if (folderIndex === -1) {
-          console.log(`Folder ${folder} not found`)
+  parser.parseURL(feedUrl, (err, feed) => {
+    if (!err) {
+      console.log(`Adding ${feed.title}`)
+      const opmlFile = readFileSync('./feeds.opml', 'utf8')
+      parse(opmlFile, (_err, opmlDoc) => {
+        if (
+          getAllFeeds(opmlDoc.opml.body.subs).some(item => item.xmlUrl === feedUrl)
+        ) {
+          console.log(`${feed.title} already exists`)
           return
         }
-        opmlDoc.opml.body.subs[folderIndex].subs.push(newOutline)
-      }
-      else {
-        opmlDoc.opml.body.subs.push(newOutline)
-      }
-      const newOpml = stringify(opmlDoc)
-      writeFileSync('./feeds.opml', newOpml)
-    })
+        const newOutline = {
+          text: feed.title,
+          title: feed.title,
+          description: feed.description || '',
+          type: 'rss',
+          version: 'RSS',
+          xmlUrl: feedUrl,
+          htmlUrl: feed.link,
+        }
+        if (folder) {
+          const folderIndex = opmlDoc.opml.body.subs.findIndex(
+            item => item.text === folder && item.subs,
+          )
+          if (folderIndex === -1) {
+            console.log(`Folder ${folder} not found`)
+            return
+          }
+          opmlDoc.opml.body.subs[folderIndex].subs.push(newOutline)
+        }
+        else {
+          opmlDoc.opml.body.subs.push(newOutline)
+        }
+        const newOpml = stringify(opmlDoc)
+        writeFileSync('./feeds.opml', newOpml)
+      })
+    }
+    else {
+      console.error(err)
+    }
   })
 }
 
@@ -70,6 +86,9 @@ if (newFeed.length !== 0) {
         parseAndWrite(`https://rsshub.app/bilibili/user/dynamic/${item.link.split('/').pop()}`, '视频')
       })
     })
+  }
+  else if (shortcode === 't') {
+    parseAndWrite(`https://rsshub.app/twitter/user/${feedUrl}`, '时间线')
   }
   else {
     parseAndWrite(feedUrl, folder)
