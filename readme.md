@@ -1,4 +1,4 @@
-# rss to bot
+# rss to bot [![send feeds to bot](https://github.com/hyoban/rss-to-bot/actions/workflows/main.yml/badge.svg)](https://github.com/hyoban/rss-to-bot/actions/workflows/main.yml)
 
 Use GitHub Action to send your rss feed to telegram bot.
 
