@@ -63,7 +63,15 @@ async function load() {
 
 const isImageUrl = async (url: string) => {
   // fetch the image and check the content type
-  if (url.startsWith('https://h5.sinaimg.cn/m/emoticon/icon/default/'))
+
+  const imagePrefixToCheck = [
+    // weibo
+    'https://h5.sinaimg.cn/m/emoticon/icon/default/',
+    'https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal',
+    // github
+    'https://github.githubassets.com/images/icons/emoji/unicode',
+  ]
+  if (imagePrefixToCheck.some(i => url.startsWith(i)))
     return false
 
   try {
