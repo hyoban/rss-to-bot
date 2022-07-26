@@ -64,12 +64,14 @@ async function load() {
 const isImageUrl = async (url: string) => {
   // fetch the image and check the content type
 
+  if (
+    url.includes('h5.sinaimg.cn/upload') && url.includes('timeline_card')
+  ) return false
+
   const imagePrefixToCheck = [
     // weibo
     'https://h5.sinaimg.cn/m/emoticon/icon/',
     'https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal',
-    'https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png',
-    'https://h5.sinaimg.cn/upload/100/959/2020/05/09/timeline_card_small_super_default.png',
     // github
     'https://github.githubassets.com/images/icons/emoji/unicode',
     // bilibili
