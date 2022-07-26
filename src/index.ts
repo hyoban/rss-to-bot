@@ -66,8 +66,10 @@ const isImageUrl = async (url: string) => {
 
   const imagePrefixToCheck = [
     // weibo
-    'https://h5.sinaimg.cn/m/emoticon/icon/default/',
+    'https://h5.sinaimg.cn/m/emoticon/icon/',
     'https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal',
+    'https://h5.sinaimg.cn/upload/2015/09/25/3/timeline_card_small_web_default.png',
+    'https://h5.sinaimg.cn/upload/100/959/2020/05/09/timeline_card_small_super_default.png',
     // github
     'https://github.githubassets.com/images/icons/emoji/unicode',
     // bilibili
@@ -199,17 +201,12 @@ const parseAndSend = async (subItem: Sub) => {
     const res = await parser.parseURL(subItem.xmlUrl!)
     // eslint-disable-next-line no-console
     console.log('feed:', subItem.title, subItem.xmlUrl)
-    if (process.env.IS_TEST) {
-      await send(res.items[0], subItem)
-    }
-    else {
-      for (const item of res.items) {
-        const date = dayjs(item.isoDate)
-        if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
-          if (!sent.has(JSON.stringify({ date, link: item.link }))) {
-            sent.add(JSON.stringify({ date, link: item.link }))
-            await send(item, subItem)
-          }
+    for (const item of res.items) {
+      const date = dayjs(item.isoDate)
+      if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
+        if (!sent.has(JSON.stringify({ date, link: item.link }))) {
+          sent.add(JSON.stringify({ date, link: item.link }))
+          await send(item, subItem)
         }
       }
     }
