@@ -70,6 +70,8 @@ const isImageUrl = async (url: string) => {
     'https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal',
     // github
     'https://github.githubassets.com/images/icons/emoji/unicode',
+    // bilibili
+    'https://i0.hdslb.com/bfs/emote',
   ]
   if (imagePrefixToCheck.some(i => url.startsWith(i)))
     return false
