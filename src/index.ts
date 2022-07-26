@@ -7,10 +7,10 @@ import type { Item } from 'rss-parser'
 import Parser from 'rss-parser'
 import axios from 'axios'
 import dotenv from 'dotenv'
-import feeds from './feeds.json'
+import _feeds from './feeds.json'
 import data from './sent.json'
-import type { Sub } from './types'
-
+import type { Feeds, Sub } from './types'
+const feeds = _feeds as Feeds
 dotenv.config()
 
 const token = process.env.TG_TOKEN
@@ -108,6 +108,20 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 let success = 0
 
+const tagsToReplace = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+}
+
+function replaceTag(tag: string) {
+  return tagsToReplace[tag as keyof typeof tagsToReplace] || tag
+}
+
+function safe_tags_replace(str: string) {
+  return str.replace(/[&<>]/g, replaceTag)
+}
+
 const send = async (item: Item, subItem: Sub) => {
   if (item.content) {
     const images = []
@@ -121,7 +135,7 @@ const send = async (item: Item, subItem: Sub) => {
     if (images.length > 0) {
       const caption = {
         caption:
-          `<b>${item.title}</b>` + `\n${subItem.title}\n\n${item.link}`,
+          `<b>${safe_tags_replace(item.title ?? '')}</b>` + `\n${subItem.title}\n\n${item.link}`,
         parse_mode: 'HTML',
         disable_web_page_preview: true,
       }
@@ -170,7 +184,7 @@ const send = async (item: Item, subItem: Sub) => {
     await delay(500)
     await bot.sendMessage(
       chatId,
-      `<b>${item.title}</b>` + `\n${subItem.title}\n\n${item.link}`,
+      `<b>${safe_tags_replace(item.title ?? '')}</b>` + `\n${subItem.title}\n\n${item.link}`,
       { parse_mode: 'HTML', disable_web_page_preview: true },
     )
     success++
