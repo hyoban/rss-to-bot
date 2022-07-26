@@ -7,8 +7,8 @@
   "license": "ISC",
   "keywords": [],
   "scripts": {
-    "run": "cd src && ofm wirte && esno index.ts",
-    "add": "cd src && ofm add",
+    "run": "cd src && pnpm -r run build && ofm wirte && esno index.ts",
+    "add": "cd src && pnpm -r run build && ofm add",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
