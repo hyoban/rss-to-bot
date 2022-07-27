@@ -32,7 +32,9 @@ const chatId = process.env.TG_CHAT_ID
 
 const parser = new Parser()
 
-const isDateVaild = (date: Dayjs) => date.isAfter(dayjs().subtract(1, 'day'))
+const getTzDate = (isoDateString?: string) => dayjs.utc(isoDateString).tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+const isDateVaild = (date: Dayjs) => date.isAfter(getTzDate().subtract(1, 'day'))
+
 const isFeedNeedToBeSent = (item: Item) => {
   if (
     item.link?.includes('https://github.com/')
@@ -50,21 +52,25 @@ const isFeedNeedToBeSent = (item: Item) => {
   return true
 }
 
-let sent = new Set()
+let sent = new Set<string>()
 
 async function save() {
   // eslint-disable-next-line no-console
   console.log('save sent feeds to file', sent.size)
-  await writeFile('./sent.json', JSON.stringify(Array.from(sent)))
+  await writeFile(
+    './sent.json',
+    JSON.stringify(
+      Array.from(sent)
+        .map(i => JSON.parse(i))
+        .filter(i => isDateVaild(getTzDate(i.date)))
+        .map(i => (JSON.stringify(i))),
+    ),
+  )
 }
 
 async function load() {
   try {
     const pre = Array.from(data)
-      .map(i => JSON.parse(i))
-      .map(i => ({ date: dayjs(i.date), link: i.link }))
-      .filter(i => isDateVaild(i.date))
-      .map(i => JSON.stringify(i))
     sent = new Set(pre)
     // eslint-disable-next-line no-console
     console.log('load sent feeds from file', sent.size)
@@ -225,8 +231,6 @@ const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: S
 
 const removeV2exHash = (str: string) => str.includes('https://www.v2ex.com/') ? str.replace(/#/g, '') : str
 
-const getTzDate = (isoDateString: string) => dayjs.utc(isoDateString).tz(process.env.TIMEZONE ?? dayjs.tz.guess())
-
 const parseAll = async (subItem: Sub) => {
   try {
     const res = await parser.parseURL(subItem.xmlUrl!)
@@ -263,6 +267,7 @@ const getAllFeeds = (subs: Sub[] | undefined) => {
 }
 
 async function main() {
+  log(process.env.TIMEZONE)
   if (!process.env.IS_TEST)
     await load()
   const allFeeds = getAllFeeds(feeds.opml.body.subs)
