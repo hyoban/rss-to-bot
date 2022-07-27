@@ -221,7 +221,7 @@ const parseAll = async (subItem: Sub) => {
     // eslint-disable-next-line no-console
     console.log('feed:', subItem.title, subItem.xmlUrl)
     for (const item of res.items) {
-      const date = dayjs(item.isoDate).utc().local().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+      const date = dayjs(item.isoDate).utc().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
       if (process.env.IS_TEST) {
         addItem(item, date, subItem)
         break
