@@ -213,7 +213,7 @@ const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: S
   })
 }
 
-const removeHash = (str: string) => str.replace(/#/g, '')
+const removeV2exHash = (str: string) => str.includes('https://www.v2ex.com/') ? str.replace(/#/g, '') : str
 
 const parseAll = async (subItem: Sub) => {
   try {
@@ -227,8 +227,8 @@ const parseAll = async (subItem: Sub) => {
         break
       }
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
-        if (!sent.has(JSON.stringify({ date, link: removeHash(item.link ?? '') }))) {
-          sent.add(JSON.stringify({ date, link: removeHash(item.link ?? '') }))
+        if (!sent.has(JSON.stringify({ date, link: removeV2exHash(item.link ?? '') }))) {
+          sent.add(JSON.stringify({ date, link: removeV2exHash(item.link ?? '') }))
           addItem(item, date, subItem)
         }
       }
