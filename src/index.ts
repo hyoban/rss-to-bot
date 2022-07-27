@@ -1,6 +1,8 @@
 import { writeFile } from 'fs/promises'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
 // @ts-expect-error no type information available for module
 import TelegramBot from 'node-telegram-bot-api'
 import type { Item } from 'rss-parser'
@@ -12,6 +14,9 @@ import data from './sent.json'
 import type { Feeds, Sub } from './types'
 const feeds = _feeds as Feeds
 dotenv.config()
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 const token = process.env.TG_TOKEN
 const bot = new TelegramBot(token)
@@ -89,12 +94,10 @@ const isImageUrl = async (url: string) => {
   }
 }
 
-const handleError = (e: any, item: Item, subItem: Sub, images?: string[]) => {
+const handleError = (e: any, item: Item, images?: string[]) => {
   console.error(
     'error(send to tg):',
-    item.title,
-    subItem.title,
-    subItem.xmlUrl,
+    item,
     images,
     e.message,
   )
@@ -126,7 +129,9 @@ function safe_tags_replace(str: string) {
   return str.replace(/[&<>]/g, replaceTag)
 }
 
-const send = async (item: Item, subItem: Sub) => {
+const send = async (item: Item) => {
+  const textTemplate = `<b>${safe_tags_replace(item.title ?? '')}</b>` + `\n${item.creator}\n${item.pubDate}\n\n${item.link}`
+
   if (item.content) {
     const images = []
     for (const i of item.content.matchAll(
@@ -138,8 +143,7 @@ const send = async (item: Item, subItem: Sub) => {
 
     if (images.length > 0) {
       const caption = {
-        caption:
-          `<b>${safe_tags_replace(item.title ?? '')}</b>` + `\n${subItem.title}\n\n${item.link}`,
+        caption: textTemplate,
         parse_mode: 'HTML',
         disable_web_page_preview: true,
       }
@@ -168,7 +172,7 @@ const send = async (item: Item, subItem: Sub) => {
           return
         }
         catch (e) {
-          handleError(e, item, subItem, images)
+          handleError(e, item, images)
         }
       }
       else {
@@ -179,7 +183,7 @@ const send = async (item: Item, subItem: Sub) => {
           return
         }
         catch (e) {
-          handleError(e, item, subItem, images)
+          handleError(e, item, images)
         }
       }
     }
@@ -188,27 +192,44 @@ const send = async (item: Item, subItem: Sub) => {
     await delay(500)
     await bot.sendMessage(
       chatId,
-      `<b>${safe_tags_replace(item.title ?? '')}</b>` + `\n${subItem.title}\n\n${item.link}`,
+      textTemplate,
       { parse_mode: 'HTML', disable_web_page_preview: true },
     )
     success++
   }
   catch (e) {
-    handleError(e, item, subItem)
+    handleError(e, item)
   }
 }
 
-const parseAndSend = async (subItem: Sub) => {
+const itemsToBeSent = [] as Item[]
+
+const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: Sub) => {
+  itemsToBeSent.push({
+    ...item,
+    isoDate: date.toISOString(),
+    pubDate: date.format('YYYY-MM-DD HH:mm:ss'),
+    creator: item.creator ?? item.author ?? subItem.title,
+  })
+}
+
+const removeHash = (str: string) => str.replace(/#/g, '')
+
+const parseAll = async (subItem: Sub) => {
   try {
     const res = await parser.parseURL(subItem.xmlUrl!)
     // eslint-disable-next-line no-console
     console.log('feed:', subItem.title, subItem.xmlUrl)
     for (const item of res.items) {
-      const date = dayjs(item.isoDate)
+      const date = dayjs(item.isoDate).utc().local().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+      if (process.env.IS_TEST) {
+        addItem(item, date, subItem)
+        break
+      }
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
-        if (!sent.has(JSON.stringify({ date, link: item.link }))) {
-          sent.add(JSON.stringify({ date, link: item.link }))
-          await send(item, subItem)
+        if (!sent.has(JSON.stringify({ date, link: removeHash(item.link ?? '') }))) {
+          sent.add(JSON.stringify({ date, link: removeHash(item.link ?? '') }))
+          addItem(item, date, subItem)
         }
       }
     }
@@ -218,15 +239,27 @@ const parseAndSend = async (subItem: Sub) => {
   }
 }
 
+// Get all feeds info
+const getAllFeeds = (subs: Sub[] | undefined) => {
+  let feeds: Sub[] = []
+  subs?.forEach((sub) => {
+    if (sub.type === 'rss')
+      feeds.push(sub)
+    else
+      feeds = feeds.concat(getAllFeeds(sub.subs))
+  })
+  return feeds
+}
+
 async function main() {
   if (!process.env.IS_TEST)
     await load()
-  for (const group of feeds.opml.body.subs) {
-    if (group.subs)
-      for (const subItem of group.subs) await parseAndSend(subItem as Sub)
-    else
-      await parseAndSend(group as Sub)
-  }
+  await Promise.all(getAllFeeds(feeds.opml.body.subs).map(parseAll))
+  for (const item of itemsToBeSent.sort((a, b) => {
+    const aDate = dayjs(a.isoDate).utc().local().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+    const bDate = dayjs(b.isoDate).utc().local().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+    return aDate.valueOf() - bDate.valueOf()
+  }).slice(process.env.IS_TEST ? 350 : 0)) await send(item)
   // eslint-disable-next-line no-console
   console.log('success:', success)
   if (!process.env.IS_TEST)
