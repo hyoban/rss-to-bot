@@ -231,7 +231,7 @@ const parseAll = async (subItem: Sub) => {
     const res = await parser.parseURL(subItem.xmlUrl!)
     cliBar.increment()
     for (const item of res.items) {
-      const date = dayjs(item.isoDate).utc().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+      const date = dayjs.utc(item.isoDate).tz(process.env.TIMEZONE ?? dayjs.tz.guess())
       if (process.env.IS_TEST) {
         addItem(item, date, subItem)
         break
