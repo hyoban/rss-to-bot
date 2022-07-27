@@ -23,6 +23,7 @@ jobs:
       - env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TIMEZONE: ${{ secrets.TIMEZONE }}
         run: nr run
 
       - uses: EndBug/add-and-commit@v9
