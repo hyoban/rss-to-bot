@@ -218,7 +218,6 @@ const itemsToBeSent = [] as Item[]
 const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: Sub) => {
   itemsToBeSent.push({
     ...item,
-    isoDate: date.toISOString(),
     pubDate: date.format('YYYY-MM-DD HH:mm:ss'),
     creator: item.creator ?? item.author ?? subItem.title,
   })
@@ -226,12 +225,14 @@ const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: S
 
 const removeV2exHash = (str: string) => str.includes('https://www.v2ex.com/') ? str.replace(/#/g, '') : str
 
+const getTzDate = (isoDateString: string) => dayjs.utc(isoDateString).tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+
 const parseAll = async (subItem: Sub) => {
   try {
     const res = await parser.parseURL(subItem.xmlUrl!)
     cliBar.increment()
     for (const item of res.items) {
-      const date = dayjs.utc(item.isoDate).tz(process.env.TIMEZONE ?? dayjs.tz.guess())
+      const date = getTzDate(item.isoDate ?? '')
       if (process.env.IS_TEST) {
         addItem(item, date, subItem)
         break
@@ -268,18 +269,17 @@ async function main() {
   log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
   cliBar.start(allFeeds.length, 0)
   await Promise.all(allFeeds.map(parseAll))
+  cliBar.stop()
 
   log(chalk.blue(`\nFound ${itemsToBeSent.length} items, sending...`))
   cliBar.start(itemsToBeSent.length, 0)
-  for (const item of itemsToBeSent.sort((a, b) => {
-    const aDate = dayjs(a.isoDate).utc().local().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
-    const bDate = dayjs(b.isoDate).utc().local().tz(process.env.TIMEZONE ?? dayjs.tz.guess())
-    return aDate.valueOf() - bDate.valueOf()
-  })) await send(item)
+  for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!)))
+    await send(item)
 
   if (!process.env.IS_TEST)
     await save()
   log(chalk.green(`Success: ${success}`))
+  cliBar.stop()
 }
 
 main()
