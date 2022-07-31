@@ -60,7 +60,6 @@
 			<outline text="DEV Community: Lydia Hallie" title="DEV Community: Lydia Hallie" description="" type="rss" version="RSS" htmlUrl="https://dev.to/lydiahallie" xmlUrl="https://dev.to/feed/lydiahallie" />
 			<outline text="Diu.notes" title="Diu.notes" description="" type="rss" version="RSS" htmlUrl="https://notes.ljl.li/" xmlUrl="https://notes.ljl.li/rss/" />
 			<outline text="DoneSpeak" title="DoneSpeak" description="" type="rss" version="RSS" htmlUrl="" xmlUrl="https://donespeak.gitlab.io/atom.xml" />
-			<outline text="Farmer" title="Farmer" description="" type="rss" version="RSS" htmlUrl="" xmlUrl="https://blog.farmer233.top/atom.xml" />
 			<outline text="findxc/blog Issues" title="findxc/blog Issues" description="" type="rss" version="RSS" htmlUrl="https://github.com/findxc/blog/issues" xmlUrl="https://rsshub.app/github/issue/findxc/blog" />
 			<outline text="GitHub Changelog" title="GitHub Changelog" description="" type="rss" version="RSS" htmlUrl="https://github.blog/" xmlUrl="https://github.blog/changelog/feed/" />
 			<outline text="Guyskk的博客" title="Guyskk的博客" description="" type="rss" version="RSS" htmlUrl="https://blog.guyskk.com/" xmlUrl="https://blog.guyskk.com/feed.xml" />
@@ -271,6 +270,7 @@
 			<outline text="三咲智子 的 bilibili 动态" title="三咲智子 的 bilibili 动态" description="三咲智子 的 bilibili 动态 - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)" type="rss" version="RSS" xmlUrl="https://rsshub.app/bilibili/user/dynamic/24679024" htmlUrl="https://space.bilibili.com/24679024/dynamic" />
 			<outline text="科技宅小明 的 bilibili 动态" title="科技宅小明 的 bilibili 动态" description="科技宅小明 的 bilibili 动态 - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)" type="rss" version="RSS" xmlUrl="https://rsshub.app/bilibili/user/dynamic/5626102" htmlUrl="https://space.bilibili.com/5626102/dynamic" />
 			<outline text="黑貓的野望 的 bilibili 动态" title="黑貓的野望 的 bilibili 动态" description="黑貓的野望 的 bilibili 动态 - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)" type="rss" version="RSS" xmlUrl="https://rsshub.app/bilibili/user/dynamic/14202394" htmlUrl="https://space.bilibili.com/14202394/dynamic" />
+			<outline text="是只呆熊猫呀 的 bilibili 动态" title="是只呆熊猫呀 的 bilibili 动态" description="是只呆熊猫呀 的 bilibili 动态 - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)" type="rss" version="RSS" xmlUrl="https://rsshub.app/bilibili/user/dynamic/1754373551" htmlUrl="https://space.bilibili.com/1754373551/dynamic" />
 			</outline>
 		<outline text="时间线" title="时间线" >
 			<outline text="AliveGameStudio的微博" title="AliveGameStudio的微博" description="" type="rss" version="RSS" htmlUrl="https://weibo.com/1743273140/" xmlUrl="http://rsshub.hyoban.cc:1200/weibo/user/1743273140" />
