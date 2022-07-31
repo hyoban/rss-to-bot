@@ -9,14 +9,10 @@ import type { Item } from 'rss-parser'
 import Parser from 'rss-parser'
 import axios from 'axios'
 import dotenv from 'dotenv'
-// @ts-expect-error no type information available for module
-import cliProgress from 'cli-progress'
 import chalk from 'chalk'
 import _feeds from './feeds.json'
 import data from './sent.json'
 import type { Feeds, Sub } from './types'
-
-const cliBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
 
 // eslint-disable-next-line no-console
 const log = console.log
@@ -183,7 +179,6 @@ const send = async (item: Item) => {
             }),
           )
           success++
-          cliBar.increment()
           return
         }
         catch (e) {
@@ -195,7 +190,6 @@ const send = async (item: Item) => {
           await delay(500)
           await bot.sendPhoto(chatId, images[0], caption)
           success++
-          cliBar.increment()
           return
         }
         catch (e) {
@@ -212,7 +206,6 @@ const send = async (item: Item) => {
       { parse_mode: 'HTML', disable_web_page_preview: true },
     )
     success++
-    cliBar.increment()
   }
   catch (e) {
     handleError(e, item)
@@ -234,7 +227,6 @@ const removeV2exHash = (str: string) => str.includes('https://www.v2ex.com/') ? 
 const parseAll = async (subItem: Sub) => {
   try {
     const res = await parser.parseURL(subItem.xmlUrl!)
-    cliBar.increment()
     for (const item of res.items) {
       const date = getTzDate(item.isoDate ?? '')
       if (process.env.IS_TEST) {
@@ -272,19 +264,15 @@ async function main() {
     await load()
   const allFeeds = getAllFeeds(feeds.opml.body.subs)
   log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
-  cliBar.start(allFeeds.length, 0)
   await Promise.all(allFeeds.map(parseAll))
-  cliBar.stop()
 
   log(chalk.blue(`\nFound ${itemsToBeSent.length} items, sending...`))
-  cliBar.start(itemsToBeSent.length, 0)
   for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!)))
     await send(item)
 
   if (!process.env.IS_TEST)
     await save()
   log(chalk.green(`Success: ${success}`))
-  cliBar.stop()
 }
 
 main()
