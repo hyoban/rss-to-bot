@@ -32,6 +32,7 @@ const getTzDate = (isoDateString?: string) => dayjs.utc(isoDateString).tz(proces
 const isDateVaild = (date: Dayjs) => date.isAfter(getTzDate().subtract(1, 'day'))
 
 const isFeedNeedToBeSent = (item: Item) => {
+  // ignore some types of github notifications
   if (
     item.link?.includes('https://github.com/')
     && [
@@ -44,6 +45,13 @@ const isFeedNeedToBeSent = (item: Item) => {
       'deleted tag',
     ].some(i => item.title?.includes(i))
   ) return false
+
+  // ignore easy's weibo
+  if (
+    item.title?.match(/「GitHub多星项目 ✨」.+用过的同学来评论下？/)
+    || item.title?.match(/每天一个Linux上会用到的命令：今天是.+你用过吗/)
+  )
+    return false
 
   return true
 }
