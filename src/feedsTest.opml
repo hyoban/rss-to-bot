@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<opml version="2.0">
+	<head>
+		<title>Subscriptions-Githubfeed.opml</title>
+		<generator>opmlPackage v0.4.24</generator>
+		</head>
+	<body>
+    <outline text="Easy的微博" title="Easy的微博" description="" type="rss" version="RSS" htmlUrl="https://weibo.com/1088413295/" xmlUrl="https://rsshub.app/weibo/user/1088413295" />
+		</body>
+	</opml>

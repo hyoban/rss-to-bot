@@ -48,8 +48,8 @@ const isFeedNeedToBeSent = (item: Item) => {
 
   // ignore easy's weibo
   if (
-    item.title?.match(/「GitHub多星项目 ✨」.+用过的同学来评论下？/)
-    || item.title?.match(/每天一个Linux上会用到的命令：今天是.+你用过吗/)
+    /「GitHub多星项目 ✨」.+/.test(item.title!)
+    || /每天一个Linux上会用到的命令：今天是.+你用过吗/.test(item.title!)
   )
     return false
 
@@ -237,10 +237,6 @@ const parseAll = async (subItem: Sub) => {
     const res = await parser.parseURL(subItem.xmlUrl!)
     for (const item of res.items) {
       const date = getTzDate(item.isoDate ?? '')
-      if (process.env.IS_TEST) {
-        addItem(item, date, subItem)
-        break
-      }
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
         if (!sent.has(JSON.stringify({ date, link: removeV2exHash(item.link ?? '') }))) {
           sent.add(JSON.stringify({ date, link: removeV2exHash(item.link ?? '') }))
