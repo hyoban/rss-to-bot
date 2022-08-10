@@ -15,7 +15,7 @@ Use Github Action to send your RSS feeds to Telegram bots.
     2. The id `TG_CHAT_ID` of your conversation with the bot
     3. The time zone you are in `TIMEZONE`. For example `Asia/Shanghai`
     4. `GIST_ID` used to store sending records
-    5. `GITHUB_TOKEN` is used to update the gist of sending records, [Generate](https://github.com/settings/tokens/new?scopes=gist)
+    5. `GIST_TOKEN` is used to update the gist of sending records, [Generate](https://github.com/settings/tokens/new?scopes=gist)
 
 ## FAQ
 

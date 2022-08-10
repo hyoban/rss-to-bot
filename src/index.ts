@@ -15,7 +15,7 @@ import type { Feeds, Sub } from './types'
 
 const box = new GistBox({
   id: process.env.GIST_ID ?? '',
-  token: process.env.GITHUB_TOKEN ?? '',
+  token: process.env.GIST_TOKEN ?? '',
 })
 
 // eslint-disable-next-line no-console
