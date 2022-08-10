@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "pnpm -r run dev",
     "gen": "cd src && ofm wirte",
-    "run": "pnpm run gen && esno index.ts",
+    "run": "cd src && ofm wirte && esno index.ts",
     "test": "cd src && ofm wirte ./feedsTest.opml && esno index.ts",
     "add": "cd src && ofm add",
     "lint": "eslint .",
