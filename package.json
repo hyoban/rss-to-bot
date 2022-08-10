@@ -7,9 +7,10 @@
   "license": "ISC",
   "keywords": [],
   "scripts": {
-    "run": "cd src && pnpm -r run build && ofm wirte && esno index.ts",
-    "test": "cd src && pnpm -r run build && ofm wirte ./feedsTest.opml && esno index.ts",
-    "add": "cd src && pnpm -r run build && ofm add",
+    "gen": "cd src && pnpm -r dev && ofm wirte",
+    "run": "pnpm run gen && esno index.ts",
+    "test": "cd src && pnpm -r run dev && ofm wirte ./feedsTest.opml && esno index.ts",
+    "add": "cd src && pnpm -r run dev && ofm add",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
