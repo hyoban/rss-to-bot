@@ -1,4 +1,3 @@
-import { writeFile } from 'fs/promises'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
@@ -10,9 +9,14 @@ import Parser from 'rss-parser'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import chalk from 'chalk'
+import { GistBox } from 'gist-box'
 import _feeds from './feeds.json'
-import data from './sent.json'
 import type { Feeds, Sub } from './types'
+
+const box = new GistBox({
+  id: process.env.GIST_ID ?? '',
+  token: process.env.GITHUB_TOKEN ?? '',
+})
 
 // eslint-disable-next-line no-console
 const log = console.log
@@ -59,25 +63,25 @@ const isFeedNeedToBeSent = (item: Item) => {
 let sent = new Set<string>()
 
 async function save() {
-  // eslint-disable-next-line no-console
-  console.log('save sent feeds to file', sent.size)
-  await writeFile(
-    './sent.json',
-    JSON.stringify(
-      Array.from(sent)
-        .map(i => JSON.parse(i))
-        .filter(i => isDateVaild(getTzDate(i.date)))
-        .map(i => (JSON.stringify(i))),
-    ),
-  )
+  if (process.env.GIST_TOKEN && process.env.GIST_ID) {
+    // eslint-disable-next-line no-console
+    console.log('save sent feeds to gist', sent.size)
+
+    await box.update({
+      filename: 'sent.json',
+      content: 'The new content',
+    })
+  }
 }
 
 async function load() {
   try {
-    const pre = Array.from(data)
+    // use axios to get the content of the gist
+    const res = await axios.get(`https://api.github.com/gists/${process.env.GIST_ID}`)
+    const pre = Array.from(res.data.files['sent.json'].content as string[])
     sent = new Set(pre)
     // eslint-disable-next-line no-console
-    console.log('load sent feeds from file', sent.size)
+    console.log('load sent feeds from gist', sent.size)
   }
   catch (e) {
     console.error('error:', e)
