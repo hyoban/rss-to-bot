@@ -19,6 +19,7 @@ jobs:
       - run: npm install --location=global @antfu/ni
 
       - run: ni
+      - run: nr dev
 
       - env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
