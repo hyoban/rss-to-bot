@@ -417,5 +417,6 @@ https://t.co/jj0gxAqfuR | https://t.co/WSkIvxeN8d | Element Plus Team Member - M
 			<outline text="ghui" title="ghui" description="" type="rss" version="RSS" xmlUrl="https://v2ex.com/feed/member/ghui.xml" htmlUrl="https://www.v2ex.com/" />
 			<outline text="formulahendry" title="formulahendry" description="" type="rss" version="RSS" xmlUrl="https://v2ex.com/feed/member/formulahendry.xml" htmlUrl="https://www.v2ex.com/" />
 			</outline>
+		<outline text="Windows Insider Blog" title="Windows Insider Blog" description="" type="rss" version="RSS" xmlUrl="https://blogs.windows.com/windows-insider/feed/" htmlUrl="https://blogs.windows.com/windows-insider" />
 		</body>
 	</opml>
