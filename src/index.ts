@@ -239,7 +239,7 @@ const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: S
   })
 }
 
-const removeV2exHash = (str: string) => str.includes('https://www.v2ex.com/') ? str.replace(/#/g, '') : str
+const removeV2exHash = (str: string) => str.replace(/https:\/\/www\.v2ex\.com\/t\/(\d+)#reply\d+/gm, 'https://www.v2ex.com/t/$1')
 
 const parseAll = async (subItem: Sub) => {
   try {
