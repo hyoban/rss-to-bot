@@ -97,7 +97,7 @@ const isImageUrl = async (url: string) => {
   // fetch the image and check the content type
 
   if (
-    url.includes('h5.sinaimg.cn/upload') && url.includes('timeline_card')
+    url.includes('sinaimg.cn') && url.includes('timeline_card')
   ) return false
 
   const imagePrefixToCheck = [
