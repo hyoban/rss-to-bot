@@ -51,6 +51,9 @@ const isFeedNeedToBeSent = (item: Item) => {
   )
     return false
 
+  if (item.title?.includes('拼多多'))
+    return false
+
   return true
 }
 
