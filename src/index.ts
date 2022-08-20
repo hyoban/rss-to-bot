@@ -177,44 +177,14 @@ const send = async (item: Item) => {
         parse_mode: 'HTML',
         disable_web_page_preview: true,
       }
-      if (images.length > 1) {
-        try {
-          await delay(500)
-          await bot.sendMediaGroup(
-            chatId,
-            images.map((v, i) => {
-              if (i === 0) {
-                return {
-                  type: 'photo',
-                  media: v,
-                  ...caption,
-                }
-              }
-              else {
-                return {
-                  type: 'photo',
-                  media: v,
-                }
-              }
-            }),
-          )
-          success++
-          return
-        }
-        catch (e) {
-          handleError(e, item, images)
-        }
+      try {
+        await delay(500)
+        await bot.sendPhoto(chatId, images[0], caption)
+        success++
+        return
       }
-      else {
-        try {
-          await delay(500)
-          await bot.sendPhoto(chatId, images[0], caption)
-          success++
-          return
-        }
-        catch (e) {
-          handleError(e, item, images)
-        }
+      catch (e) {
+        handleError(e, item, images)
       }
     }
   }
