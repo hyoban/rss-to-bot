@@ -160,7 +160,7 @@ function safe_tags_replace(str: string) {
 }
 
 const send = async (item: Item) => {
-  const textTemplate = `<b>${safe_tags_replace(item.title ?? '')}</b>` + `\n${item.creator}\n${item.pubDate}\n\n${item.link}`
+  const textTemplate = `<b>${safe_tags_replace(item.title?.trim() ?? '')}</b>` + `\n${item.creator?.trim()}\n${item.pubDate?.trim()}\n\n${item.link?.trim()}`
 
   if (item.content) {
     const images = []
