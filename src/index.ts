@@ -222,7 +222,7 @@ const parseAll = async (subItem: Sub) => {
     for (const item of res.items) {
       const date = getTzDate(item.isoDate ?? '')
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
-        if (!sent.has(JSON.stringify({ date, link: linkAfterTrim(item.link ?? '') }))) {
+        if (!Array.from(sent).some(i => JSON.parse(i).link === linkAfterTrim(item.link ?? ''))) {
           sent.add(JSON.stringify({ date, link: linkAfterTrim(item.link ?? '') }))
           addItem(item, date, subItem)
         }
