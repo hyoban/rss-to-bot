@@ -212,7 +212,9 @@ const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: S
   })
 }
 
-const removeV2exHash = (str: string) => str.replace(/https:\/\/www\.v2ex\.com\/t\/(\d+)#reply\d+/gm, 'https://www.v2ex.com/t/$1')
+const linkAfterTrim = (str: string) =>
+  str.replace(/https:\/\/www\.v2ex\.com\/t\/(\d+)#reply\d+/gm, 'https://www.v2ex.com/t/$1')
+    .replace(/https:\/\/www\.coolapk\.com\/feed\/(\d+)\?shareKey=.*/gm, 'https://www.coolapk.com/feed/$1')
 
 const parseAll = async (subItem: Sub) => {
   try {
@@ -220,8 +222,8 @@ const parseAll = async (subItem: Sub) => {
     for (const item of res.items) {
       const date = getTzDate(item.isoDate ?? '')
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
-        if (!sent.has(JSON.stringify({ date, link: removeV2exHash(item.link ?? '') }))) {
-          sent.add(JSON.stringify({ date, link: removeV2exHash(item.link ?? '') }))
+        if (!sent.has(JSON.stringify({ date, link: linkAfterTrim(item.link ?? '') }))) {
+          sent.add(JSON.stringify({ date, link: linkAfterTrim(item.link ?? '') }))
           addItem(item, date, subItem)
         }
       }
