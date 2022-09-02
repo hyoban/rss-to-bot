@@ -45,6 +45,7 @@
 			<outline text="被删" title="被删" description="" type="rss" version="RSS" htmlUrl="https://github.com/godbasin" xmlUrl="https://github.com/godbasin.atom" />
 			<outline text="Richasy" title="Richasy" description="" type="rss" version="RSS" xmlUrl="https://github.com/Richasy.atom" htmlUrl="https://github.com/Richasy" />
 			<outline text="itorr" title="itorr" description="" type="rss" version="RSS" xmlUrl="https://github.com/itorr.atom" htmlUrl="https://github.com/itorr" />
+			<outline text="BetaSu" title="BetaSu" description="" type="rss" version="RSS" xmlUrl="https://github.com/BetaSu.atom" htmlUrl="https://github.com/BetaSu" />
 			</outline>
 		<outline text="dev.to top (week)" title="dev.to top (week)" description="" type="rss" version="RSS" htmlUrl="https://dev.to/top/week" xmlUrl="https://rsshub.app/dev.to/top/week" />
 		<outline text="freeCodeCamp.org" title="freeCodeCamp.org" description="" type="rss" version="RSS" htmlUrl="https://www.freecodecamp.org/news/" xmlUrl="https://www.freecodecamp.org/news/rss/" />
