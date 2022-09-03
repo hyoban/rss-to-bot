@@ -15,7 +15,6 @@ importers:
       esno: ^0.16.3
       node-telegram-bot-api: ^0.58.0
       opml: ^0.4.24
-      opml-file-manager: workspace:*
       rss-parser: ^3.12.0
       typescript: ^4.7.4
     dependencies:
@@ -32,7 +31,6 @@ importers:
       '@types/node': 18.6.1
       eslint: 8.20.0
       esno: 0.16.3
-      opml-file-manager: link:packages/opml-file-manager
       typescript: 4.7.4
 
   packages/opml-file-manager:

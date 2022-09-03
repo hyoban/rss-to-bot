@@ -1,20 +1,22 @@
-import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 // @ts-expect-error no type information available for module
 import TelegramBot from 'node-telegram-bot-api'
-import type { Item } from 'rss-parser'
 import Parser from 'rss-parser'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import chalk from 'chalk'
-import _feeds from './feeds.json'
+// @ts-expect-error no type information available for module
+import { parse } from 'opml'
+
+import type { Item } from 'rss-parser'
+import type { Dayjs } from 'dayjs'
+import type { AxiosResponse } from 'axios'
 import type { Feeds, Sub } from './types'
 
 // eslint-disable-next-line no-console
 const log = console.log
-const feeds = _feeds as Feeds
 dotenv.config()
 
 dayjs.extend(utc)
@@ -82,10 +84,8 @@ async function save() {
   }
 }
 
-async function load() {
+async function load(res: AxiosResponse) {
   try {
-    // use axios to get the content of the gist
-    const res = await axios.get(`https://api.github.com/gists/${process.env.GIST_ID}`)
     const pre = Array.from(JSON.parse(res.data.files['sent.json'].content) as string[])
     sent = new Set(pre)
     // eslint-disable-next-line no-console
@@ -246,21 +246,62 @@ const getAllFeeds = (subs: Sub[] | undefined) => {
   return feeds
 }
 
+const countFeeds = (subs: Sub[] | undefined) => {
+  let count = 0
+  subs?.forEach((sub) => {
+    if (sub.type === 'rss')
+      count++
+    else
+      count += countFeeds(sub.subs)
+  })
+  return count
+}
+
+async function opmlToJson(opmltext: string): Promise<Feeds> {
+  return new Promise((resolve, reject) => {
+    try {
+      parse(opmltext, async (err: any, theOutline: any) => {
+        // eslint-disable-next-line no-console
+        console.log('Total feeds:', countFeeds(theOutline.opml.body.subs))
+        if (!err) {
+          resolve(theOutline)
+        }
+        else {
+          console.error('Parse opml file error', err)
+          reject(err)
+        }
+      })
+    }
+    catch (err) {
+      console.error('Load opml file error', err)
+      reject(err)
+    }
+  })
+}
+
 async function main() {
   log(process.env.TIMEZONE)
+  const res = await axios.get(`https://api.github.com/gists/${process.env.GIST_ID}`)
   if (!process.env.IS_TEST)
-    await load()
-  const allFeeds = getAllFeeds(feeds.opml.body.subs)
-  log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
-  await Promise.all(allFeeds.map(parseAll))
+    await load(res)
 
-  log(chalk.blue(`\nFound ${itemsToBeSent.length} items, sending...`))
-  for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!)))
-    await send(item)
+  try {
+    const feeds = await opmlToJson(res.data.files['feeds.opml'].content)
+    const allFeeds = getAllFeeds(feeds.opml.body.subs)
+    log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
+    await Promise.all(allFeeds.map(parseAll))
 
-  if (!process.env.IS_TEST)
-    await save()
-  log(chalk.green(`Success: ${success}`))
+    log(chalk.blue(`\nFound ${itemsToBeSent.length} items, sending...`))
+    for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!)))
+      await send(item)
+
+    if (!process.env.IS_TEST)
+      await save()
+    log(chalk.green(`Success: ${success}`))
+  }
+  catch (e) {
+    console.error(e)
+  }
 }
 
 main()

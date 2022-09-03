@@ -12,8 +12,8 @@
     1. Telegram 的机器人 token `TG_TOKEN`
     2. 你与该机器人对话的 id `TG_CHAT_ID`
     3. 你所处的时区 `TIMEZONE`. 比如 `Asia/Shanghai`
-    4. 用于存储发送记录的 `GIST_ID`
-    5. `GIST_TOKEN` 用于更新发送记录的 gist，[生成一个](https://github.com/settings/tokens/new?scopes=gist)
+    4. 用于存储数据的 `GIST_ID`，包括订阅文件和发送记录
+    5. `GIST_TOKEN` 用于更新 gist 的内容，[生成一个](https://github.com/settings/tokens/new?scopes=gist)
 
 ## 常见问题
 
