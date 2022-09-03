@@ -17,6 +17,8 @@ Use Github Action to send your RSS feeds to Telegram bots.
     4. `GIST_ID` used to store feeds.opml and sent records
     5. `GIST_TOKEN` is used to update the gist, [Generate](https://github.com/settings/tokens/new?scopes=gist)
 
+Here is a [gist example](https://gist.github.com/hyoban/4be1f8948a571a2a467cb1608b5185e6).
+
 ## FAQ
 
 ### How to get `TG_CHAT_ID`

@@ -15,6 +15,8 @@
     4. 用于存储数据的 `GIST_ID`，包括订阅文件和发送记录
     5. `GIST_TOKEN` 用于更新 gist 的内容，[生成一个](https://github.com/settings/tokens/new?scopes=gist)
 
+这是一个 [gist 示例](https://gist.github.com/hyoban/4be1f8948a571a2a467cb1608b5185e6)。
+
 ## 常见问题
 
 ### 如何获取 `TG_CHAT_ID`
