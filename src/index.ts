@@ -218,6 +218,10 @@ const parseAll = async (subItem: Sub) => {
   try {
     const res = await parser.parseURL(subItem.xmlUrl!)
     for (const item of res.items) {
+      if (process.env.IS_TEST) {
+        addItem(item, getTzDate(item.pubDate), subItem)
+        break
+      }
       const date = getTzDate(item.isoDate ?? '')
       if (isDateVaild(date) && isFeedNeedToBeSent(item)) {
         if (!Array.from(sent).some(i => JSON.parse(i).link === linkAfterTrim(item.link ?? ''))) {
@@ -249,9 +253,13 @@ async function main() {
     await load(res)
 
   try {
-    const feedUrls = (res.data.files['feeds.txt'].content as string).split('\n')
+    const feedUrls = (res.data.files['feeds.txt'].content as string)
+      .split('\n')
+      .map(i => i.trim())
+      .filter(i => i.startsWith('http') || i.startsWith('https'))
     const allFeeds = await Promise.all(feedUrls.map(i => parseFeedUrlInfo(i)))
     log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
+
     const allFeedsSub = allFeeds.map((feed, index): Sub => ({
       text: feed?.title ?? '',
       title: feed?.title ?? '',
