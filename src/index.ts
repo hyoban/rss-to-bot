@@ -7,13 +7,11 @@ import Parser from 'rss-parser'
 import axios from 'axios'
 import dotenv from 'dotenv'
 import chalk from 'chalk'
-// @ts-expect-error no type information available for module
-import { parse } from 'opml'
 
 import type { Item } from 'rss-parser'
 import type { Dayjs } from 'dayjs'
 import type { AxiosResponse } from 'axios'
-import type { Feeds, Sub } from './types'
+import type { Sub } from './types'
 
 // eslint-disable-next-line no-console
 const log = console.log
@@ -234,49 +232,14 @@ const parseAll = async (subItem: Sub) => {
   }
 }
 
-// Get all feeds info
-const getAllFeeds = (subs: Sub[] | undefined) => {
-  let feeds: Sub[] = []
-  subs?.forEach((sub) => {
-    if (sub.type === 'rss')
-      feeds.push(sub)
-    else
-      feeds = feeds.concat(getAllFeeds(sub.subs))
-  })
-  return feeds
-}
-
-const countFeeds = (subs: Sub[] | undefined) => {
-  let count = 0
-  subs?.forEach((sub) => {
-    if (sub.type === 'rss')
-      count++
-    else
-      count += countFeeds(sub.subs)
-  })
-  return count
-}
-
-async function opmlToJson(opmltext: string): Promise<Feeds> {
-  return new Promise((resolve, reject) => {
-    try {
-      parse(opmltext, async (err: any, theOutline: any) => {
-        // eslint-disable-next-line no-console
-        console.log('Total feeds:', countFeeds(theOutline.opml.body.subs))
-        if (!err) {
-          resolve(theOutline)
-        }
-        else {
-          console.error('Parse opml file error', err)
-          reject(err)
-        }
-      })
-    }
-    catch (err) {
-      console.error('Load opml file error', err)
-      reject(err)
-    }
-  })
+const parseFeedUrlInfo = async (link: string) => {
+  try {
+    const res = await parser.parseURL(link)
+    return res
+  }
+  catch (e) {
+    console.error('error:', link)
+  }
 }
 
 async function main() {
@@ -286,10 +249,15 @@ async function main() {
     await load(res)
 
   try {
-    const feeds = await opmlToJson(res.data.files['feeds.opml'].content)
-    const allFeeds = getAllFeeds(feeds.opml.body.subs)
+    const feedUrls = (res.data.files['feeds.txt'].content as string).split('\n')
+    const allFeeds = await Promise.all(feedUrls.map(i => parseFeedUrlInfo(i)))
     log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
-    await Promise.all(allFeeds.map(parseAll))
+    const allFeedsSub = allFeeds.map((feed, index): Sub => ({
+      text: feed?.title ?? '',
+      title: feed?.title ?? '',
+      xmlUrl: feedUrls[index],
+    }))
+    await Promise.all(allFeedsSub.map(i => parseAll(i)))
 
     log(chalk.blue(`\nFound ${itemsToBeSent.length} items, sending...`))
     for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!)))

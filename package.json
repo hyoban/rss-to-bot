@@ -13,19 +13,19 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "cac": "^6.7.12",
+    "cac": "^6.7.14",
     "chalk": "^5.0.1",
-    "dayjs": "^1.11.4",
-    "dotenv": "^16.0.1",
-    "node-telegram-bot-api": "^0.58.0",
+    "dayjs": "^1.11.5",
+    "dotenv": "^16.0.2",
+    "node-telegram-bot-api": "^0.59.0",
     "opml": "^0.4.24",
     "rss-parser": "^3.12.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.25.2",
-    "@types/node": "^18.6.1",
-    "eslint": "^8.20.0",
+    "@antfu/eslint-config": "^0.27.0",
+    "@types/node": "^18.7.18",
+    "eslint": "^8.23.1",
     "esno": "^0.16.3",
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.3"
   }
 }
