@@ -257,6 +257,7 @@ async function main() {
       .split('\n')
       .map(i => i.trim())
       .filter(i => i.startsWith('http') || i.startsWith('https'))
+      .filter(i => !(process.env.IS_TEST && i.includes('v2ex.com')))
     const allFeeds = await Promise.all(feedUrls.map(i => parseFeedUrlInfo(i)))
     log(chalk.blue(`Found ${allFeeds.length} feeds, fetching...`))
 
