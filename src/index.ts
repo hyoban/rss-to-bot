@@ -11,7 +11,9 @@ import chalk from 'chalk'
 import type { Item } from 'rss-parser'
 import type { Dayjs } from 'dayjs'
 import type { AxiosResponse } from 'axios'
+import { isFeedNeedToBeSent } from './custom'
 import type { Sub } from './types'
+import { delay, getTzDate, isDateVaild, isImageUrl, linkAfterTrim, safeTagsReplace } from './util'
 
 // eslint-disable-next-line no-console
 const log = console.log
@@ -25,37 +27,6 @@ const bot = new TelegramBot(token)
 const chatId = process.env.TG_CHAT_ID
 
 const parser = new Parser()
-
-const getTzDate = (isoDateString?: string) => dayjs.utc(isoDateString).tz(process.env.TIMEZONE ?? dayjs.tz.guess())
-const isDateVaild = (date: Dayjs) => date.isAfter(getTzDate().subtract(1, 'day'))
-
-const isFeedNeedToBeSent = (item: Item) => {
-  // ignore some types of github notifications
-  if (
-    item.link?.includes('https://github.com/')
-    && [
-      'deleted branch',
-      'pushed to',
-      'created a branch',
-      'closed an issue',
-      'closed a pull request',
-      'created a tag',
-      'deleted tag',
-    ].some(i => item.title?.includes(i))
-  ) return false
-
-  // ignore easy's weibo
-  if (
-    /「GitHub多星项目 ✨」.+/.test(item.title!)
-    || /每天一个Linux上会用到的命令：今天是.+你用过吗/.test(item.title!)
-  )
-    return false
-
-  if (item.title?.includes('拼多多'))
-    return false
-
-  return true
-}
 
 let sent = new Set<string>()
 
@@ -94,34 +65,6 @@ async function load(res: AxiosResponse) {
   }
 }
 
-const isImageUrl = async (url: string) => {
-  // fetch the image and check the content type
-
-  if (
-    url.includes('sinaimg.cn') && url.includes('timeline_card')
-  ) return false
-
-  const imagePrefixToCheck = [
-    // weibo
-    'https://h5.sinaimg.cn/m/emoticon/icon/',
-    'https://face.t.sinajs.cn/t4/appstyle/expression/ext/normal',
-    // github
-    'https://github.githubassets.com/images/icons/emoji/unicode',
-    // bilibili
-    'https://i0.hdslb.com/bfs/emote',
-  ]
-  if (imagePrefixToCheck.some(i => url.startsWith(i)))
-    return false
-
-  try {
-    const res = await axios.head(url)
-    return res.headers['content-type'].startsWith('image/')
-  }
-  catch (e) {
-    return false
-  }
-}
-
 const handleError = (e: any, item: Item, images?: string[]) => {
   log(
     'error(send to tg):',
@@ -139,26 +82,10 @@ const handleError = (e: any, item: Item, images?: string[]) => {
   ) process.exit(1)
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
 let success = 0
 
-const tagsToReplace = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-}
-
-function replaceTag(tag: string) {
-  return tagsToReplace[tag as keyof typeof tagsToReplace] || tag
-}
-
-function safe_tags_replace(str: string) {
-  return str.replace(/[&<>]/g, replaceTag)
-}
-
 const send = async (item: Item) => {
-  const textTemplate = `<b>${safe_tags_replace(item.title?.trim() ?? '')}</b>` + `\n${item.creator?.trim()}\n${item.pubDate?.trim()}\n\n${item.link?.trim()}`
+  const textTemplate = `<b>${safeTagsReplace(item.title?.trim() ?? '')}</b>` + `\n${item.creator?.trim()}\n${item.pubDate?.trim()}\n\n${item.link?.trim()}`
 
   if (item.content) {
     const images = []
@@ -209,10 +136,6 @@ const addItem = (item: { [key: string]: string } & Item, date: Dayjs, subItem: S
     creator: item.creator ?? item.author ?? subItem.title,
   })
 }
-
-const linkAfterTrim = (str: string) =>
-  str.replace(/https:\/\/www\.v2ex\.com\/t\/(\d+)#reply\d+/gm, 'https://www.v2ex.com/t/$1')
-    .replace(/https:\/\/www\.coolapk\.com\/feed\/(\d+)\?shareKey=.*/gm, 'https://www.coolapk.com/feed/$1')
 
 const parseAll = async (subItem: Sub) => {
   try {
