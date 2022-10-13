@@ -74,6 +74,7 @@ const handleError = (e: any, item: Item, images?: string[]) => {
   )
   if (
     ![
+      'wrong type of the web page content',
       'failed to get HTTP URL content',
       'Failed to get HTTP URL content',
       'Wrong type of the web page content',
