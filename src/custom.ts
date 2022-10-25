@@ -13,17 +13,21 @@ export function isFeedNeedToBeSent(item: Item) {
       'created a tag',
       'deleted tag',
     ].some(i => item.title?.includes(i))
-  ) return false
+  ) {
+    return false
+  }
 
   // ignore easy's weibo
   if (
     /「GitHub多星项目 ✨」.+/.test(item.title!)
     || /每天一个Linux上会用到的命令：今天是.+你用过吗/.test(item.title!)
-  )
+  ) {
     return false
+  }
 
-  if (item.title?.includes('拼多多'))
+  if (item.title?.includes('拼多多')) {
     return false
+  }
 
   return true
 }

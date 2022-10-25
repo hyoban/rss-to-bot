@@ -59,8 +59,7 @@ async function load(res: AxiosResponse) {
     sent = new Set(pre)
     // eslint-disable-next-line no-console
     console.log('load sent feeds from gist', sent.size)
-  }
-  catch (e) {
+  } catch (e) {
     console.error('error:', e)
   }
 }
@@ -80,7 +79,9 @@ const handleError = (e: any, item: Item, images?: string[]) => {
       'Wrong type of the web page content',
       'wrong file identifier/HTTP URL specified',
     ].some(i => e.message.includes(i))
-  ) process.exit(1)
+  ) {
+    process.exit(1)
+  }
 }
 
 let success = 0
@@ -93,8 +94,9 @@ const send = async (item: Item) => {
     for (const i of item.content.matchAll(
       /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg))/g,
     )) {
-      if ((await isImageUrl(i[0])) && images.length < 9)
+      if ((await isImageUrl(i[0])) && images.length < 9) {
         images.push(i[0])
+      }
     }
 
     if (images.length > 0) {
@@ -108,8 +110,7 @@ const send = async (item: Item) => {
         await bot.sendPhoto(chatId, images[0], caption)
         success++
         return
-      }
-      catch (e) {
+      } catch (e) {
         handleError(e, item, images)
       }
     }
@@ -122,8 +123,7 @@ const send = async (item: Item) => {
       { parse_mode: 'HTML', disable_web_page_preview: true },
     )
     success++
-  }
-  catch (e) {
+  } catch (e) {
     handleError(e, item)
   }
 }
@@ -154,8 +154,7 @@ const parseAll = async (subItem: Sub) => {
         }
       }
     }
-  }
-  catch (e) {
+  } catch (e) {
     console.error('error:', subItem.title, subItem.xmlUrl)
   }
 }
@@ -164,8 +163,7 @@ const parseFeedUrlInfo = async (link: string) => {
   try {
     const res = await parser.parseURL(link)
     return res
-  }
-  catch (e) {
+  } catch (e) {
     console.error('error:', link)
   }
 }
@@ -173,8 +171,9 @@ const parseFeedUrlInfo = async (link: string) => {
 async function main() {
   log(process.env.TIMEZONE)
   const res = await axios.get(`https://api.github.com/gists/${process.env.GIST_ID}`)
-  if (!process.env.IS_TEST)
+  if (!process.env.IS_TEST) {
     await load(res)
+  }
 
   try {
     const feedUrls = (res.data.files['feeds.txt'].content as string)
@@ -193,14 +192,16 @@ async function main() {
     await Promise.all(allFeedsSub.map(i => parseAll(i)))
 
     log(chalk.blue(`\nFound ${itemsToBeSent.length} items, sending...`))
-    for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!)))
+    for (const item of itemsToBeSent.sort((a, b) => a.pubDate!.localeCompare(b.pubDate!))) {
       await send(item)
+    }
 
-    if (!process.env.IS_TEST)
+    if (!process.env.IS_TEST) {
       await save()
+    }
+
     log(chalk.green(`Success: ${success}`))
-  }
-  catch (e) {
+  } catch (e) {
     console.error(e)
   }
 }

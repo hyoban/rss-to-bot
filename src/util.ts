@@ -15,7 +15,9 @@ export async function isImageUrl(url: string) {
 
   if (
     url.includes('sinaimg.cn') && url.includes('timeline_card')
-  ) return false
+  ) {
+    return false
+  }
 
   const imagePrefixToCheck = [
     // weibo
@@ -26,14 +28,14 @@ export async function isImageUrl(url: string) {
     // bilibili
     'https://i0.hdslb.com/bfs/emote',
   ]
-  if (imagePrefixToCheck.some(i => url.startsWith(i)))
+  if (imagePrefixToCheck.some(i => url.startsWith(i))) {
     return false
+  }
 
   try {
     const res = await axios.head(url)
     return res.headers['content-type'].startsWith('image/')
-  }
-  catch (e) {
+  } catch (e) {
     return false
   }
 }
