@@ -14,16 +14,13 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - run: corepack enable
-      - run: npm install --location=global @antfu/ni
-
-      - run: ni
-
+      - run: pnpm install
       - env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           TIMEZONE: ${{ secrets.TIMEZONE }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
-        run: nr run
+        run: pnpm run start

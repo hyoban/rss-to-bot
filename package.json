@@ -7,7 +7,7 @@
   "license": "ISC",
   "keywords": [],
   "scripts": {
-    "run": "cd src && esno index.ts",
+    "start": "cd src && esno index.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
