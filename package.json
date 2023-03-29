@@ -1,5 +1,6 @@
 {
   "name": "rss-to-bot",
+  "packageManager": "pnpm@7.29.3",
   "type": "module",
   "version": "1.0.0",
   "description": "",
