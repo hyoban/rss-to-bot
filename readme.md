@@ -9,15 +9,14 @@ Use Github Action to send your RSS feeds to Telegram bots.
 ## USE
 
 1. Click `Use this template` to generate your own repository
-2. Creat a new gist which should includes a `feeds.opml` (your rss feed), you can export one from other readers
+2. Creat a new gist which should includes `feeds.txt` and `sent.json`
+   1. Here is a [gist example](https://gist.github.com/hyoban/4be1f8948a571a2a467cb1608b5185e6).
 3. `Settings->Secrets->Actions->New repository secrets` to create:
     1. Telegram's robot token `TG_TOKEN`
     2. The id `TG_CHAT_ID` of your conversation with the bot
     3. The time zone you are in `TIMEZONE`. For example `Asia/Shanghai`
-    4. `GIST_ID` used to store feeds.opml and sent records
+    4. `GIST_ID` used to store your `feeds.txt` and `sent.json` files
     5. `GIST_TOKEN` is used to update the gist, [Generate](https://github.com/settings/tokens/new?scopes=gist)
-
-Here is a [gist example](https://gist.github.com/hyoban/4be1f8948a571a2a467cb1608b5185e6).
 
 ## FAQ
 

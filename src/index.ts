@@ -5,7 +5,7 @@ import timezone from 'dayjs/plugin/timezone'
 import TelegramBot from 'node-telegram-bot-api'
 import Parser from 'rss-parser'
 import axios from 'axios'
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 import chalk from 'chalk'
 
 import type { Item } from 'rss-parser'
@@ -95,7 +95,12 @@ const send = async (item: Item) => {
       /(http)?s?:?(\/\/[^"']*\.(?:png|jpg|jpeg))/g,
     )) {
       if ((await isImageUrl(i[0])) && images.length < 9) {
-        images.push(i[0])
+        if (i[0].startsWith('//')) {
+          // '//files.toodaylab.com/2023/03/20230401news_20230331230554_01.jpg'
+          images.push(`https:${i[0]}`)
+        } else {
+          images.push(i[0])
+        }
       }
     }
 
