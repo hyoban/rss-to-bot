@@ -2,8 +2,6 @@
 
 [![send feeds to bot](https://github.com/hyoban/rss-to-bot/actions/workflows/main.yml/badge.svg)](https://github.com/hyoban/rss-to-bot/actions/workflows/main.yml)
 
-[中文](./readme-zh.md)
-
 Use Github Action to send your RSS feeds to Telegram bots.
 
 ## USE
